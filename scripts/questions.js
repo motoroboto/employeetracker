@@ -9,7 +9,7 @@ function init() {
             message: "What would you like to do?",
             choices: [
                 "View Company Records",
-                "Update Employee Roles",
+                "Update Employee's Information",
                 "Add a Record"
             ]
         })
@@ -18,7 +18,7 @@ function init() {
                 case "View Company Records":
                     viewRecords();
                     break;
-                case "Update Employee Roles":
+                case "Update Employee's Information":
                     connection.query("SELECT employee.id, first_name, last_name, job_id, title FROM employee INNER JOIN job ON employee.job_id = job.id;", function (err, res) {
                         if (err) throw err;
                         console.table(res);
@@ -67,6 +67,34 @@ function viewRecords() {
 };
 
 function updateEmployee() {
+    inquirer
+        .prompt({
+
+            name: "action",
+            type: "list",
+            message: "What would you like to update?",
+            choices: [
+                "Empoyee Role",
+                "Employee Manager"
+            ]
+        })
+        .then(function (answer) {
+            switch (answer.action) {
+                case "Employee Role":
+                    updateEmployeeRole();
+                    break;
+
+                case "Employee Manager":
+                    updateEmployeeManager();
+                    break;
+            }
+
+        });
+};
+
+
+
+function updateEmployeeRole() {
     inquirer.prompt([
         {
             name: "id",
@@ -91,6 +119,33 @@ function updateEmployee() {
         }
         );
 };
+
+function updateEmployeeManager() {
+    inquirer.prompt([
+        {
+            name: "id",
+            type: "number",
+            message: "Enter the ID of the employee whose role you would like to update",
+        },
+        {
+            name: "manager",
+            type: "number",
+            message: "Please enter their new Manager's ID number",
+        },
+    ])
+        .then(function (answer) {
+            connection.query("UPDATE employee SET ? WHERE ?",
+                [{ manager_id: answer.manager }, { id: answer.id }],
+                function (err, res) {
+                    if (err) throw err;
+                    console.log(`Employee ID ${answer.id} updated with Manager ID ${answer.manager}`)
+                    init();
+                }
+            )
+        }
+        );
+};
+
 
 function addRecord() {
     inquirer
