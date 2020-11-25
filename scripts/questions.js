@@ -10,7 +10,9 @@ function init() {
             choices: [
                 "View Company Records",
                 "Update Employee's Information",
-                "Add a Record"
+                "Add a Record",
+                "Delete a Record",
+                "View Total Department Budget"
             ]
         })
         .then(function (answer) {
@@ -18,6 +20,7 @@ function init() {
                 case "View Company Records":
                     viewRecords();
                     break;
+
                 case "Update Employee's Information":
                     connection.query("SELECT employee.id, first_name, last_name, job_id, title FROM employee INNER JOIN job ON employee.job_id = job.id;", function (err, res) {
                         if (err) throw err;
@@ -25,8 +28,17 @@ function init() {
                         updateEmployee();
                     });
                     break;
+
                 case "Add a Record":
                     addRecord();
+                    break;
+
+                case "Delete a Record":
+                    deleteRecord();
+                    break;
+
+                case "View Total Department Budget":
+                    viewBudget();
                     break;
             }
         })
@@ -342,9 +354,169 @@ function addEmployee() {
     });
 };
 
-module.exports = {
-    init,
-    viewRecords,
-    addRecord,
-    updateEmployee
+function deleteRecord() {
+    inquirer
+        .prompt({
+            name: "action",
+            type: "list",
+            message: "What records would you like to delete?",
+            choices: [
+                "Departments",
+                "Jobs",
+                "Employees",
+                "Return to Main Menu"
+            ]
+        })
+        .then(function (answer) {
+            switch (answer.action) {
+                case "Departments":
+                    connection.query("SELECT * FROM department;", function (err, res) {
+                        if (err) throw err;
+                        console.table(res);
+                        deleteDepartment();
+                    });
+                    break;
+
+                case "Jobs":
+                    connection.query("SELECT * FROM job;", function (err, res) {
+                        if (err) throw err;
+                        console.table(res);
+                        deleteJob();
+                    });
+                    break;
+
+                case "Employees":
+                    connection.query("SELECT employee.id, first_name, last_name, job_id, title FROM employee INNER JOIN job ON employee.job_id = job.id;", function (err, res) {
+                        if (err) throw err;
+                        console.table(res);
+                        deleteEmployee();
+                    });
+                    break;
+
+                case "Return to Main Menu":
+                    init();
+                    break;
+            }
+        });
 };
+
+function deleteDepartment() {
+    inquirer
+        .prompt([
+            {
+                name: "deleted",
+                type: "number",
+                message: "Please enter the department ID for the Department you would like to delete:"
+            },
+            {
+                name: "confirm",
+                type: "list",
+                message: "Are you sure you want to delete this Department?",
+                choices: ["YES", "NO"]
+            },
+        ])
+        .then(function (answer) {
+            switch (answer.confirm) {
+                case "YES":
+                    connection.query(
+                        "DELETE FROM department WHERE ?",
+                        { id: answer.deleted },
+                        function (err, res) {
+                            if (err) throw err;
+                            console.log('Department Deleted');
+                            init();
+                        }
+                    );
+                    break;
+
+                case "NO":
+                    console.log('Okay. No records will be deleted')
+                    init();
+                    break;
+            }
+        });
+};
+
+function deleteEmployee() {
+    inquirer
+        .prompt([
+            {
+                name: "deleted",
+                type: "number",
+                message: "Please enter the ID for the Employee you would like to delete:"
+            },
+            {
+                name: "confirm",
+                type: "list",
+                message: "Are you sure you want to delete this Employee?",
+                choices: ["YES", "NO"]
+            },
+        ])
+        .then(function (answer) {
+            switch (answer.confirm) {
+                case "YES":
+                    connection.query(
+                        "DELETE FROM employee WHERE ?",
+                        { id: answer.deleted },
+                        function (err, res) {
+                            if (err) throw err;
+                            console.log('Employee Deleted');
+                            init();
+                        }
+                    );
+                    break;
+
+                case "NO":
+                    console.log('Okay. No records will be deleted')
+                    init();
+                    break;
+            }
+        });
+};
+
+function deleteJob() {
+    inquirer
+        .prompt([
+            {
+                name: "deleted",
+                type: "number",
+                message: "Please enter the ID for the Job you would like to delete:"
+            },
+            {
+                name: "confirm",
+                type: "list",
+                message: "Are you sure you want to delete this Job? (this will also delete all employees with this job)",
+                choices: ["YES", "NO"]
+            },
+        ])
+        .then(function (answer) {
+            switch (answer.confirm) {
+                case "YES":
+                    connection.query(
+                        "DELETE FROM job WHERE ?",
+                        { id: answer.deleted },
+                        function (err, res) {
+                            if (err) throw err;
+                        }
+                    );
+                    connection.query(
+                        "DELETE FROM employee WHERE ?",
+                        { job_id: answer.deleted },
+                        function (err, res) {
+                            if (err) throw err;
+                        }
+                    );
+                    init();
+
+                    break;
+
+                case "NO":
+                    console.log('Okay. No records will be deleted')
+                    init();
+                    break;
+            }
+        });
+};
+
+
+module.exports = { init };
