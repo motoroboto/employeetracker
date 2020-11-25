@@ -42,6 +42,7 @@ function viewRecords() {
                 "Departments",
                 "Jobs",
                 "Employees",
+                "Manager's Direct Reports",
                 "Return to Main Menu"
             ]
         })
@@ -57,6 +58,14 @@ function viewRecords() {
 
                 case "Employees":
                     findEmployee();
+                    break;
+
+                case "Manager's Direct Reports":
+                    connection.query("SELECT employee.id, first_name, last_name, title, salary FROM employee INNER JOIN job ON employee.job_id = job.id;", function (err, res) {
+                        if (err) throw err;
+                        console.table(res);
+                        findManagerEmployees();
+                    });
                     break;
 
                 case "Return to Main Menu":
@@ -204,6 +213,25 @@ function findEmployee() {
         console.table(res);
         init();
     });
+};
+
+function findManagerEmployees() {
+    inquirer.prompt([
+        {
+            name: "manager",
+            type: "number",
+            message: "Enter the ID of Manager for whom you would like to view Direct Reports",
+        },
+    ])
+        .then(function (answer) {
+            connection.query("SELECT * FROM employee WHERE ?",
+                [{ manager_id: answer.manager }],
+                function (err, res) {
+                    if (err) throw err;
+                    console.table(res);
+                    init();
+                })
+        });
 };
 
 function addDepartment() {
