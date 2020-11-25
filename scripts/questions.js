@@ -38,7 +38,11 @@ function init() {
                     break;
 
                 case "View Total Department Budget":
-                    viewBudget();
+                    connection.query("SELECT * FROM department;", function (err, res) {
+                        if (err) throw err;
+                        console.table(res);
+                        viewBudget();
+                    });
                     break;
             }
         })
@@ -518,5 +522,30 @@ function deleteJob() {
         });
 };
 
+function viewBudget() {
+    inquirer
+        .prompt(
+            {
+                name: "department",
+                type: "number",
+                message: "Please enter the ID for the department you would like to view the budget of:"
+            }
+        )
+        .then(function (answer) {
+
+            connection.query('SELECT SUM(job.salary) AS "Department_Budget" FROM employee LEFT JOIN job ON employee.job_id = job.id LEFT JOIN department ON job.department_id = department.id WHERE ?',
+                { 'department.id': answer.department },
+                function (err, res) {
+                    if (err) {
+                        throw err;
+                    } else {
+                        console.table(res);
+                        init();
+                    }
+                }
+            )
+
+        });
+};
 
 module.exports = { init };
