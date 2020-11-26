@@ -22,11 +22,12 @@ function init() {
                     break;
 
                 case "Update Employee's Information":
-                    connection.query("SELECT employee.id, first_name, last_name, job_id, title FROM employee INNER JOIN job ON employee.job_id = job.id;", function (err, res) {
-                        if (err) throw err;
-                        console.table(res);
-                        updateEmployee();
-                    });
+                    connection.query("SELECT employee.id, first_name, last_name, title, job_id FROM employee INNER JOIN job ON employee.job_id = job.id;",
+                        function (err, res) {
+                            if (err) throw err;
+                            console.table(res);
+                            updateEmployee();
+                        });
                     break;
 
                 case "Add a Record":
@@ -38,11 +39,12 @@ function init() {
                     break;
 
                 case "View Total Department Budget":
-                    connection.query("SELECT * FROM department;", function (err, res) {
-                        if (err) throw err;
-                        console.table(res);
-                        viewBudget();
-                    });
+                    connection.query("SELECT * FROM department;",
+                        function (err, res) {
+                            if (err) throw err;
+                            console.log(res);
+                            viewBudget();
+                        });
                     break;
             }
         })
@@ -77,11 +79,12 @@ function viewRecords() {
                     break;
 
                 case "Manager's Direct Reports":
-                    connection.query("SELECT employee.id, first_name, last_name, title, salary FROM employee INNER JOIN job ON employee.job_id = job.id;", function (err, res) {
-                        if (err) throw err;
-                        console.table(res);
-                        findManagerEmployees();
-                    });
+                    connection.query("SELECT employee.id, first_name, last_name, title FROM employee INNER JOIN job ON employee.job_id = job.id WHERE employee.manager_id = 0;",
+                        function (err, res) {
+                            if (err) throw err;
+                            console.table(res);
+                            findManagerEmployees();
+                        });
                     break;
 
                 case "Return to Main Menu":
@@ -99,7 +102,7 @@ function updateEmployee() {
             type: "list",
             message: "What would you like to update?",
             choices: [
-                "Empoyee Role",
+                "Employee Role",
                 "Employee Manager"
             ]
         })
@@ -137,7 +140,7 @@ function updateEmployeeRole() {
                 [{ job_id: answer.jobID }, { id: answer.id }],
                 function (err, res) {
                     if (err) throw err;
-                    console.log(`Employee ID ${answer.id} updated with Job ID ${answer.jobID}`)
+                    console.log(`Employee ID ${answer.id} updated with Job ID ${answer.jobID}`);
                     init();
                 }
             )
@@ -293,7 +296,6 @@ function addJob() {
             },
         ])
             .then(function (answer) {
-                console.log(answer)
                 connection.query("INSERT INTO job SET ?",
                     {
                         title: answer.title,
@@ -302,7 +304,7 @@ function addJob() {
                     },
                     function (err, res) {
                         if (err) throw err;
-                        console.log(`Job ${answer.title} with salary $ ${answer.salary} in department ${answer.departmentID} added!`)
+                        console.log(`The job of ${answer.title} with a salary of $${answer.salary} in the ${answer.departmentID} department has been added!`)
                         init();
                     }
                 )
@@ -335,11 +337,10 @@ function addEmployee() {
             {
                 name: "managerID",
                 type: "number",
-                message: "What is the Manager ID Number for this employee's manager?",
+                message: "What is the Manager ID Number for this employee's manager? (please enter 0 if they have no manager)",
             }
         ])
             .then(function (answer) {
-                console.log(answer)
                 connection.query("INSERT INTO employee SET ?",
                     {
                         first_name: answer.firstName,
@@ -374,7 +375,7 @@ function deleteRecord() {
         .then(function (answer) {
             switch (answer.action) {
                 case "Departments":
-                    connection.query("SELECT * FROM department;", function (err, res) {
+                    connection.query("SELECT id, name FROM department;", function (err, res) {
                         if (err) throw err;
                         console.table(res);
                         deleteDepartment();
