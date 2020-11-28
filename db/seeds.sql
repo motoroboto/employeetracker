@@ -9,8 +9,8 @@ INSERT INTO job (title, salary, department_id) values ('Temp', 25000, 2); -- 4
 INSERT INTO job (title, salary, department_id) values ('Pilot', 50000, 2); -- 5
 INSERT INTO job (title, salary, department_id) values ('Research Assistant', 45000, 3); -- 6
 
-INSERT INTO employee (first_name, last_name, job_id) values ('Clayton', 'Forrester', 1); 
-INSERT INTO employee (first_name, last_name, job_id) values ('Joel', 'Robinson', 3); 
+INSERT INTO employee (first_name, last_name, job_id) values ('Clayton', 'Forrester', 1, 0); 
+INSERT INTO employee (first_name, last_name, job_id) values ('Joel', 'Robinson', 3, 0); 
 INSERT INTO employee (first_name, last_name, job_id, manager_id) values ('Frank', 'Conniff', 2, 1); 
 INSERT INTO employee (first_name, last_name, job_id, manager_id) values ('Mike', 'Nelson', 4, 2); 
 INSERT INTO employee (first_name, last_name, job_id, manager_id) values ('Jonah', 'Heston', 5, 2); 
