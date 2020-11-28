@@ -12,6 +12,8 @@ This node Command Management System will allow you to manage a company's employe
 - Delete Departments, Roles, and Employees
 - View The Total Budget of a Department
 
+If you would like to run it yourself simply download and then do an '-npm install'. After it has been initialized you can use the schema and seed file to create a database and then run command '-node server.js' to bring up the CLI.
+
 
 ![](https://github.com/motoroboto/employeetracker/blob/main/assets/screenshot.gif)
 
